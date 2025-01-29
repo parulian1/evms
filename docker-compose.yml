@@ -1,0 +1,17 @@
+version: '1.0'
+
+services:
+  db:
+    image: postgres:12
+    volumes:
+      - ~/apps/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=dev
+      - POSTGRES_USER=dev
+      - POSTGRES_DB=evms
+    ports:
+      - 5433:5432
+
+
+
+
