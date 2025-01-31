@@ -1,5 +1,5 @@
 import factory
-
+from factory import fuzzy
 from django.contrib.auth import get_user_model
 
 from app.users.models import Profile
@@ -19,8 +19,9 @@ class UserProfileFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     birth_place = factory.Faker('city')
     birth_date = factory.Faker('date')
-    phone_number = factory.Faker('phone_number')
-    is_guest = factory.Faker('boolean')
+    gender = fuzzy.FuzzyChoice([x[0] for x in Profile.Gender.choices])
+    occupation  = factory.Faker('job')
+    marital_status = fuzzy.FuzzyChoice([x[0] for x in Profile.MaritalStatus.choices])
 
     class Meta:
         model = Profile

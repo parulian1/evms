@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from rest_framework.test import APITestCase
 
-from app.utils.fakers import UserFactory
+from app.utils.fakers import UserFactory, UserProfileFactory
 
 
 # Create your tests here.
@@ -13,11 +13,14 @@ class UserApiTests(APITestCase):
         self.customer_email = 'emailtest@gmail.com'
         self.customer_pass = 'customerp@ss'
         self.staff2_password = '3vmsst@ff_p@552'
+        self.customer2_password = 'customerp@ss2'
         self.staff2 = UserFactory(is_active=True)
         self.staff2.set_password(self.staff2_password)
         self.staff2.save()
-        # UserProfileFactory(user=self.staff2)
-        # self.customer2 = UserFactory(is_guest=True, is_active=True)
+        UserProfileFactory(user=self.staff2)
+        self.customer2 = UserFactory(password=self.customer2_password, is_guest=True, is_active=True)
+        self.customer2.set_password(self.customer2_password)
+        self.customer2.save()
 
     def test_create_users(self):
         with self.subTest('staff registration'):
@@ -85,3 +88,4 @@ class UserApiTests(APITestCase):
             )
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertIsNotNone(response_data.get('profile'))

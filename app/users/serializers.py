@@ -8,6 +8,11 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from app.users.models import Profile
 
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        exclude = ('user', 'id',)
+
 class RegistrationSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
             required=True,
@@ -15,10 +20,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
             )
 
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    profile = ProfileSerializer(required=False)
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'password', 'first_name', 'last_name', 'phone_number', 'is_guest', )
+        fields = ('email', 'password', 'first_name', 'last_name', 'phone_number', 'is_guest', 'profile',)
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -43,6 +49,9 @@ class RegistrationSerializer(serializers.ModelSerializer):
         
         user.set_password(validated_data.get('password'))
         user.save()
+        profile_data = validated_data.get('profile', {})
+        if profile_data:
+            Profile.objects.create(user=user, **profile_data)
 
         return user
 
@@ -59,7 +68,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
+    profile = serializers.SerializerMethodField()
     class Meta:
         model = get_user_model()
         fields = (
@@ -67,10 +76,13 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'is_guest',
+            'profile',
         )
 
+    def get_profile(self, obj):
+        profile = Profile.objects.filter(user=obj).first()
+        if profile is None:
+            return {}
+        return ProfileSerializer(profile).data
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        exclude = ('user',)
+
