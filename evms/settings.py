@@ -40,9 +40,10 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'users',
-    'session_management',
-    'track',
+    'app.users.apps.UsersConfig',
+    'app.session_management.apps.SessionManagementConfig',
+    'app.track.apps.TrackConfig',
+    'app'
 ]
 
 MIDDLEWARE = [
@@ -56,6 +57,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'evms.urls'
+AUTH_USER_MODEL = 'users.User'
 
 TEMPLATES = [
     {
@@ -84,7 +86,7 @@ DATABASES = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-        'NAME': 'evms',
+        'NAME': 'eventmanagement',
 
         'USER': 'dev',
 
@@ -138,4 +140,3 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.User'
