@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,10 +40,10 @@ INSTALLED_APPS = [
 
     'rest_framework',
 
-    'app.users.apps.UsersConfig',
-    'app.session_management.apps.SessionManagementConfig',
-    'app.track.apps.TrackConfig',
-    'app'
+    'api.users.apps.UsersConfig',
+    'api.session_management.apps.SessionManagementConfig',
+    'api.track.apps.TrackConfig',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -140,3 +140,21 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+REST_FRAMEWORK = {
+    'URL_FIELD_NAME': 'href',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.DjangoModelPermissions'
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(weeks=2),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'USER_ID_FIELD': 'email'
+}

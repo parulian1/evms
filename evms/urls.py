@@ -17,7 +17,5 @@ Including another URLconf
 from django.urls import path, include
 
 urlpatterns = [
-    path('users/', include('app.users.urls', namespace='users')),
-    # path('track/', include('track.urls', namespace='tracks')),
-    # path('events/', include('session_management.urls', namespace='events')),
+    path('api/', include('api.urls', namespace='api')),
 ]
