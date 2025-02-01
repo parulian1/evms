@@ -2,7 +2,7 @@ import factory
 from factory import fuzzy
 from django.contrib.auth import get_user_model
 
-from api.track.models import Venue
+from api.track.models import Venue, Track
 from api.users.models import Profile
 
 
@@ -36,3 +36,14 @@ class VenueFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = Venue
+
+
+class TrackFactory(factory.django.DjangoModelFactory):
+    venue = factory.SubFactory(VenueFactory)
+    name = factory.Faker('name')
+    description = factory.Faker('text')
+    is_available = True
+    capacity = factory.Faker('random_int', min=1, max=100)
+
+    class Meta:
+        model = Track
