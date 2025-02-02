@@ -8,5 +8,5 @@ app_name = 'users'
 urlpatterns = [
     path('', include('api.users.urls', namespace='user-attendee')),
     path('', include('api.track.urls', namespace='track')),
-    # path('', include('api.session_management.urls', namespace='session-management')),
+    path('', include('api.session_management.urls', namespace='session-management')),
 ]

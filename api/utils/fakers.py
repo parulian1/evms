@@ -2,6 +2,7 @@ import factory
 from factory import fuzzy
 from django.contrib.auth import get_user_model
 
+from api.session_management.models import Event
 from api.track.models import Venue, Track
 from api.users.models import Profile
 
@@ -43,7 +44,20 @@ class TrackFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('name')
     description = factory.Faker('text')
     is_available = True
-    capacity = factory.Faker('random_int', min=1, max=100)
+    capacity = factory.Faker('random_int', min=10, max=100)
 
     class Meta:
         model = Track
+
+
+class EventFactory(factory.django.DjangoModelFactory):
+    name = factory.Faker('name')
+    description = factory.Faker('text')
+    track = factory.SubFactory(TrackFactory)
+    date = factory.Faker('date')
+    start_time = factory.Faker('time')
+    end_time = factory.Faker('time')
+    capacity = factory.LazyAttribute(lambda obj: obj.track.capacity - 2)
+
+    class Meta:
+        model = Event
