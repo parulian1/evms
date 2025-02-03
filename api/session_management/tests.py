@@ -21,67 +21,74 @@ class EventAndSessionApiTests(APITestCase):
             SpeakerFactory()
         self.example_session = SessionFactory()
 
-
     def test_create_event(self):
         self.client.force_authenticate(self.admin)
         current_datetime = datetime.now()
         current_date = current_datetime.date()
         current_time = current_datetime.time()
+        request_data = {
+            'track': self.example_track.id,
+            'name': 'test event',
+            'capacity': self.example_track.capacity - 2,
+            'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
+            'date': current_date,
+            'start_time': current_time,
+            'end_time': (current_datetime + timedelta(minutes=120)).time(),
+        }
         with self.subTest('success'):
-            response = self.client.post('/api/event/', {
-                'track': self.example_track.id,
-                'name': 'test event',
-                'capacity': self.example_track.capacity - 2,
-                'date': current_date,
-                'start_time': current_time,
-                'end_time': (current_datetime + timedelta(minutes=120)).time(),
-            })
+            response = self.client.post('/api/event/', request_data)
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
         with self.subTest('failed - capacity not enough'):
-            response = self.client.post('/api/event/', {
-                'track': self.example_track.id,
-                'name': 'test event',
-                'capacity': self.example_track.capacity + 100,
-                'date': current_date,
-                'start_time': current_time,
-                'end_time': (current_datetime + timedelta(minutes=120)).time(),
-            })
+            request_data['capacity'] = self.example_track.capacity + 100
+            response = self.client.post('/api/event/', request_data)
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('capacity'),
                              "Capacity is greater than track capacity.")
 
-        with self.subTest('failed - conflict track and datetime'):
+        with self.subTest('failed - conflict track and date - time'):
             EventFactory(track=self.example_track, date=current_date,
                          start_time=(current_datetime - timedelta(minutes=480)).time(),
                          end_time=(current_datetime - timedelta(minutes=360)).time())
+
             for i in range(3):
                 EventFactory(track=self.example_track, date=current_date,
-                             start_time=(current_datetime + timedelta(minutes=120*i)).time(),
-                             end_time=(current_datetime + timedelta(minutes=120*i+1)).time())
-
-            response = self.client.post('/api/event/', {
-                'track': self.example_track.id,
-                'name': 'test event',
-                'capacity': self.example_track.capacity,
-                'date': current_date,
-                'start_time': current_time,
-                'end_time': (current_datetime + timedelta(minutes=120)).time(),
-            })
+                             start_time=(current_datetime + timedelta(minutes=120 * i)).time(),
+                             end_time=(current_datetime + timedelta(minutes=120 * i + 1)).time())
+            request_data['capacity'] = self.example_track.capacity
+            response = self.client.post('/api/event/', request_data)
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
-            self.assertEqual(response_data.get('details', {}).get('main_error'), "Track already has event at this time, "
-                                              "please choose different track or time.")
+            self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('track'),
+                             "Track already has event at this time, "
+                             "please choose different track or time.")
+
+        with self.subTest('failed - conflict speaker and date - time'):
+            other_event = EventFactory(track=self.example_track, date=current_date,
+                                       start_time=(current_datetime - timedelta(minutes=480)).time(),
+                                       end_time=(current_datetime - timedelta(minutes=360)).time())
+            speaker_a = SpeakerFactory()
+            other_event.speakers.add(speaker_a)
+            other_event.save()
+            other_track = TrackFactory(venue=self.example_venue)
+            request_data['track'] = other_track.id
+            for i in range(3):
+                EventFactory(track=self.example_track, date=current_date,
+                             start_time=(current_datetime + timedelta(minutes=120 * i)).time(),
+                             end_time=(current_datetime + timedelta(minutes=120 * i + 1)).time())
+            request_data['capacity'] = self.example_track.capacity
+            request_data['speakers'].append(speaker_a.id)
+            response = self.client.post('/api/event/', request_data)
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+            self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('speakers'),
+                             "Some of the speaker(s) already has event at this time, "
+                             "please choose different speaker(s) or time.")
 
         with self.subTest('failed - bad request'):
-            response = self.client.post('/api/event/', {
-                'track': self.example_track.id,
-                'name': 'test event',
-                'date': current_date,
-                'start_time': current_time,
-                'end_time': (current_datetime + timedelta(minutes=120)).time(),
-            })
+            request_data.pop('capacity')
+            response = self.client.post('/api/event/', request_data)
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('capacity'),
@@ -89,14 +96,7 @@ class EventAndSessionApiTests(APITestCase):
 
         self.client.logout()
         with self.subTest('failed unauthorized'):
-            response = self.client.post('/api/event/', {
-                'track': self.example_track.id,
-                'name': 'test event',
-                'capacity': self.example_track.capacity - 2,
-                'date': current_date,
-                'start_time': current_time,
-                'end_time': (current_datetime + timedelta(minutes=120)).time(),
-            })
+            response = self.client.post('/api/event/', request_data)
             self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
 
     def test_get_event_detail(self):
@@ -112,7 +112,7 @@ class EventAndSessionApiTests(APITestCase):
             self.assertEqual(response_data.get('name'), sample_event.name)
 
         with self.subTest('failed - not found'):
-            response = self.client.get(f'/api/event/{sample_event.id+100}/')
+            response = self.client.get(f'/api/event/{sample_event.id + 100}/')
             self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
 
     def test_get_event_list(self):
@@ -133,29 +133,51 @@ class EventAndSessionApiTests(APITestCase):
         current_datetime = datetime.now()
         current_date = current_datetime.date()
         sample_event = EventFactory(track=self.example_track, date=current_date,
+                                    start_time=(current_datetime - timedelta(minutes=360)).time(),
+                                    end_time=(current_datetime - timedelta(minutes=240)).time())
+        EventFactory(track=self.example_track, date=current_date,
                      start_time=(current_datetime - timedelta(minutes=360)).time(),
                      end_time=(current_datetime - timedelta(minutes=240)).time())
-        new_track = TrackFactory(venue=self.example_venue)
         for i in range(3):
             EventFactory(track=self.example_track, date=current_date,
                          start_time=(current_datetime + timedelta(minutes=120 * i)).time(),
                          end_time=(current_datetime + timedelta(minutes=120 * i + 1)).time())
 
+        sample_event.speakers.clear()
+        sample_event.speakers.add(SpeakerFactory())
+        sample_event.speakers.add(SpeakerFactory())
+        sample_event.save()
+        new_track = TrackFactory(venue=self.example_venue)
         updated_data = {
             'track': new_track.id,
+            'speakers': [speaker.id for speaker in sample_event.speakers.all()],
             'name': 'updated event',
             'capacity': new_track.capacity - 5,
-            'date': current_date,
+            'date': current_date.isoformat(),
             'description': 'updated description',
-            'start_time': (current_datetime + timedelta(minutes=120)).time(),
-            'end_time': (current_datetime + timedelta(minutes=240)).time(),
+            'start_time': (current_datetime + timedelta(minutes=120)).time().isoformat(),
+            'end_time': (current_datetime + timedelta(minutes=240)).time().isoformat(),
         }
         with self.subTest('success'):
-
             response = self.client.put(f'/api/event/{sample_event.id}/', updated_data)
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.OK)
             self.assertEqual(response_data.get('name'), 'updated event')
+
+        with (self.subTest('failed - conflict speaker and date - time')):
+            other_event = Event.objects.filter(
+                date=current_date,
+                start_time=(current_datetime - timedelta(minutes=360)).time(),
+                end_time=(current_datetime - timedelta(minutes=240)).time()
+            ).exclude(id=sample_event.id).first()
+            speaker_already_in_event = other_event.speakers.first()
+            updated_data['speakers'].append(speaker_already_in_event.id)
+            response = self.client.put(f'/api/event/{sample_event.id}/', updated_data)
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+            self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('speakers'),
+                             "Some of the speaker(s) already has event at this time, "
+                             "please choose different speaker(s) or time.")
 
         with self.subTest('failed - bad request'):
             updated_data.pop('track')
@@ -190,7 +212,6 @@ class EventAndSessionApiTests(APITestCase):
         with self.subTest('success'):
             response = self.client.post('/api/session/', {
                 'events': [event.id for event in Event.objects.all()[:2]],
-                'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
                 'name': 'test session',
             })
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
@@ -272,5 +293,3 @@ class EventAndSessionApiTests(APITestCase):
         with self.subTest('failed - not found'):
             response = self.client.delete('/api/session/500/')
             self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-
-

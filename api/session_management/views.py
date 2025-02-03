@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet, mixins
 
 from api.session_management.models import Event, Session
-from api.session_management.serializers import EventSerializer, SessionSerializer, CreateAndUpdateSessionSerializer
+from api.session_management.serializers import EventSerializer, SessionSerializer, CreateAndUpdateSessionSerializer, \
+    CreateAndUpdateEventSerializer
 from api.utils.permissions import IsStaffOrAdmin, IsReadOnly
 
 
@@ -16,7 +17,7 @@ class EventViewSet(ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
-            return CreateAndUpdateSessionSerializer
+            return CreateAndUpdateEventSerializer
         return self.serializer_class
 
 

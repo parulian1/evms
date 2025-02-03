@@ -11,7 +11,7 @@ class EventSerializer(serializers.ModelSerializer):
     speakers = serializers.SerializerMethodField()
 
     def get_speakers(self, obj):
-        speakers = obj.speakers.select_related('profile').order_by('profile__first_name')
+        speakers = obj.speakers.select_related('profile')
         return [{
             'name': speaker.profile.get_full_name(),
             'role': speaker.role,
@@ -56,8 +56,10 @@ class CreateAndUpdateEventSerializer(serializers.ModelSerializer):
                 Q(start_time__gte=self.initial_data.get('end_time')) |
                 Q(end_time__gte=self.initial_data.get('start_time'))
             )
-        ).exists()
-        if existing_events_in_time_occurrence:
+        )
+        if self.instance:
+            existing_events_in_time_occurrence = existing_events_in_time_occurrence.exclude(id=self.instance.id)
+        if existing_events_in_time_occurrence.exists():
             raise serializers.ValidationError("Track already has event at this time, "
                                               "please choose different track or time.")
         return value
@@ -67,14 +69,17 @@ class CreateAndUpdateEventSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This field is required.")
         else:
             date = self.initial_data.get('date')
-            existing_events_in_time_occurrence = Event.objects.filter(
+            query  = Event.objects.filter(
                 Q(date=date),
                 Q(
                     Q(start_time__gte=self.initial_data.get('end_time')) |
                     Q(end_time__gte=self.initial_data.get('start_time'))
                 ),
-                Q(speakers__id__in=values)
-            ).exists()
+                Q(speakers__in=values)
+            ).distinct()
+            if self.instance:
+                query = query.exclude(id=self.instance.id)
+            existing_events_in_time_occurrence = query.exists()
             if existing_events_in_time_occurrence:
                 raise serializers.ValidationError("Some of the speaker(s) already has event at this time, "
                                                   "please choose different speaker(s) or time.")
