@@ -1,0 +1,1136 @@
+openapi: 3.0.3
+info:
+  title: Event Management System API
+  version: 1.0.0
+  description: "\n    Event Management System API will handle technical conferences,\
+    \ managing everything from event creation to attendee \n    registration and session\
+    \ scheduling.\n    "
+paths:
+  /api/event/:
+    get:
+      operationId: event_list
+      tags:
+      - event
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+          description: ''
+    post:
+      operationId: event_create
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateEvent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateEvent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateEvent'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAndUpdateEvent'
+          description: ''
+  /api/event/{id}/:
+    get:
+      operationId: event_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - event
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+    put:
+      operationId: event_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateEvent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateEvent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateEvent'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAndUpdateEvent'
+          description: ''
+    patch:
+      operationId: event_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedEvent'
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: ''
+    delete:
+      operationId: event_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this event.
+        required: true
+      tags:
+      - event
+      security:
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/session/:
+    get:
+      operationId: session_list
+      tags:
+      - session
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+          description: ''
+    post:
+      operationId: session_create
+      tags:
+      - session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateSession'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAndUpdateSession'
+          description: ''
+  /api/session/{id}/:
+    get:
+      operationId: session_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session.
+        required: true
+      tags:
+      - session
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+          description: ''
+    put:
+      operationId: session_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session.
+        required: true
+      tags:
+      - session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateAndUpdateSession'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateAndUpdateSession'
+          description: ''
+    patch:
+      operationId: session_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session.
+        required: true
+      tags:
+      - session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSession'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSession'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSession'
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+          description: ''
+    delete:
+      operationId: session_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this session.
+        required: true
+      tags:
+      - session
+      security:
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/session/{session_pk}/purchase/:
+    post:
+      operationId: session_purchase_create
+      parameters:
+      - in: path
+        name: session_pk
+        schema:
+          type: string
+        required: true
+      tags:
+      - session
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionPurchase'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SessionPurchase'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SessionPurchase'
+        required: true
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionPurchase'
+          description: ''
+  /api/track/:
+    get:
+      operationId: track_list
+      tags:
+      - track
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Track'
+          description: ''
+    post:
+      operationId: track_create
+      tags:
+      - track
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Track'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Track'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Track'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+          description: ''
+  /api/track/{id}/:
+    get:
+      operationId: track_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this track.
+        required: true
+      tags:
+      - track
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+          description: ''
+    put:
+      operationId: track_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this track.
+        required: true
+      tags:
+      - track
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Track'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Track'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Track'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+          description: ''
+    patch:
+      operationId: track_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this track.
+        required: true
+      tags:
+      - track
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTrack'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTrack'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTrack'
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Track'
+          description: ''
+    delete:
+      operationId: track_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this track.
+        required: true
+      tags:
+      - track
+      security:
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
+  /api/users/profile/:
+    get:
+      operationId: users_profile_retrieve
+      tags:
+      - users
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/refresh/:
+    post:
+      operationId: users_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/users/register/:
+    post:
+      operationId: users_register_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Registration'
+        required: true
+      security:
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/venue/:
+    get:
+      operationId: venue_list
+      tags:
+      - venue
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Venue'
+          description: ''
+    post:
+      operationId: venue_create
+      tags:
+      - venue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Venue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Venue'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Venue'
+          description: ''
+  /api/venue/{id}/:
+    get:
+      operationId: venue_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this venue.
+        required: true
+      tags:
+      - venue
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Venue'
+          description: ''
+    put:
+      operationId: venue_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this venue.
+        required: true
+      tags:
+      - venue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Venue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Venue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Venue'
+        required: true
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Venue'
+          description: ''
+    patch:
+      operationId: venue_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this venue.
+        required: true
+      tags:
+      - venue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVenue'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVenue'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVenue'
+      security:
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Venue'
+          description: ''
+    delete:
+      operationId: venue_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this venue.
+        required: true
+      tags:
+      - venue
+      security:
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    Attendee:
+      type: object
+      properties:
+        purchaser_email:
+          type: string
+          format: email
+        purchaser_first_name:
+          type: string
+          maxLength: 100
+        purchaser_last_name:
+          type: string
+          maxLength: 100
+        purchaser_phone_number:
+          type: string
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        phone_number:
+          type: string
+        country:
+          type: string
+          maxLength: 100
+        birth_date:
+          type: string
+          format: date
+        gender:
+          type: string
+          maxLength: 10
+        occupation:
+          type: string
+          maxLength: 100
+        marital_status:
+          type: string
+          maxLength: 10
+      required:
+      - birth_date
+      - country
+      - email
+      - first_name
+      - gender
+      - last_name
+      - marital_status
+      - occupation
+      - phone_number
+      - purchaser_email
+      - purchaser_first_name
+      - purchaser_last_name
+      - purchaser_phone_number
+    BlankEnum:
+      enum:
+      - ''
+    CreateAndUpdateEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        track:
+          type: integer
+        speakers:
+          type: array
+          items:
+            type: integer
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - capacity
+      - date
+      - end_time
+      - id
+      - name
+      - speakers
+      - start_time
+      - track
+    CreateAndUpdateSession:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        events:
+          type: array
+          items:
+            type: integer
+        name:
+          type: string
+          nullable: true
+          maxLength: 150
+      required:
+      - events
+      - id
+    CustomTokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        track:
+          $ref: '#/components/schemas/Track'
+        speakers:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - capacity
+      - date
+      - description
+      - end_time
+      - id
+      - name
+      - speakers
+      - start_time
+      - track
+    GenderEnum:
+      enum:
+      - male
+      - female
+      type: string
+      description: |-
+        * `male` - Male
+        * `female` - Female
+        * `` - Prefer Not to Say
+    MaritalStatusEnum:
+      enum:
+      - married
+      - single
+      type: string
+      description: |-
+        * `married` - Married
+        * `single` - Single
+    PatchedEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        track:
+          $ref: '#/components/schemas/Track'
+        speakers:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        date:
+          type: string
+          format: date
+        start_time:
+          type: string
+          format: time
+        end_time:
+          type: string
+          format: time
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+    PatchedSession:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+        capacity:
+          type: integer
+          description: |-
+            :param obj: session object
+            :return: total capacity of the session from all events
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 150
+    PatchedTrack:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        venue:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        is_available:
+          type: boolean
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+    PatchedVenue:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        location:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        is_available:
+          type: boolean
+    Profile:
+      type: object
+      properties:
+        country:
+          type: string
+          maxLength: 150
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        gender:
+          oneOf:
+          - $ref: '#/components/schemas/GenderEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        occupation:
+          type: string
+          maxLength: 90
+        marital_status:
+          oneOf:
+          - $ref: '#/components/schemas/MaritalStatusEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+    Registration:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 25
+        is_guest:
+          type: boolean
+          title: Guest
+        profile:
+          $ref: '#/components/schemas/Profile'
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+    Session:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/Event'
+        capacity:
+          type: integer
+          description: |-
+            :param obj: session object
+            :return: total capacity of the session from all events
+          readOnly: true
+        name:
+          type: string
+          nullable: true
+          maxLength: 150
+      required:
+      - capacity
+      - events
+      - id
+    SessionPurchase:
+      type: object
+      properties:
+        attendees:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attendee'
+      required:
+      - attendees
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    Track:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        venue:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        is_available:
+          type: boolean
+        capacity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - capacity
+      - id
+      - name
+      - venue
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_guest:
+          type: boolean
+          title: Guest
+        profile:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - email
+      - profile
+    Venue:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        location:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        is_available:
+          type: boolean
+      required:
+      - id
+      - location
+      - name
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

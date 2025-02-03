@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -39,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'drf_yasg',
+    # 'drf_spectacular',
+    # 'drf_spectacular_sidecar',
 
     'api.users.apps.UsersConfig',
     'api.session_management.apps.SessionManagementConfig',
@@ -150,6 +152,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
         # 'rest_framework.permissions.DjangoModelPermissions'
     ),
+    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 SIMPLE_JWT = {
@@ -159,3 +162,17 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'USER_ID_FIELD': 'email'
 }
+
+# SPECTACULAR_SETTINGS = {
+#     'TITLE': 'Event Management System API',
+#     'DESCRIPTION': """
+#     Event Management System API will handle technical conferences, managing everything from event creation to attendee
+#     registration and session scheduling.
+#     """,
+#     'VERSION': '1.0.0',
+#     'SERVE_INCLUDE_SCHEMA': False,
+#     'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+#     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+#     'REDOC_DIST': 'SIDECAR',
+#     # OTHER SETTINGS
+# }

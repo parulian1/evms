@@ -79,7 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
             'profile',
         )
 
-    def get_profile(self, obj):
+    def get_profile(self, obj: get_user_model()) -> dict:
         profile = Profile.objects.filter(user=obj).first()
         if profile is None:
             return {}

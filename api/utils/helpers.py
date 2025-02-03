@@ -1,7 +1,9 @@
 from http import HTTPStatus
 
+
 from rest_framework import exceptions, serializers
 from rest_framework.views import Response, exception_handler
+
 
 def get_entity_href_serializer(model_class, meta_extra_kwargs=None, *init_args, **init_kwargs):
     class EntityHrefSerializer(serializers.HyperlinkedModelSerializer):
@@ -64,3 +66,5 @@ def api_exception_handler(exception: Exception, context: dict) -> Response:
     response.data = error_payload
 
     return response
+
+

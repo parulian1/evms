@@ -14,6 +14,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     password = factory.Faker('password')
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
+    phone_number = factory.Faker('phone_number', locale="id_ID")
 
     class Meta:
         model = get_user_model()
@@ -21,7 +22,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class UserProfileFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
-    birth_place = factory.Faker('city')
+    country = factory.Faker('city')
     birth_date = factory.Faker('date')
     gender = fuzzy.FuzzyChoice([x[0] for x in Profile.Gender.choices])
     occupation  = factory.Faker('job')

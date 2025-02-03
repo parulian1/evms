@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import ModelViewSet
 
 from api.track.models import Venue, Track

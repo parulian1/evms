@@ -25,6 +25,7 @@ class CustomObtainTokenPairView(TokenObtainPairView):
 
 
 class UserProfileView(APIView):
+    serializer_class = UserSerializer
     def get(self, request):
         user = request.user
         if not user:

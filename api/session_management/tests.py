@@ -1,14 +1,15 @@
 from datetime import datetime, timedelta
 from http import HTTPStatus
 
+from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 
 from api.session_management.models import Event, Speaker
-from api.utils.fakers import UserFactory, VenueFactory, TrackFactory, EventFactory, SpeakerFactory, SessionFactory
+from api.utils.fakers import UserFactory, VenueFactory, TrackFactory, EventFactory, SpeakerFactory, SessionFactory, \
+    UserProfileFactory
 
 
 # Create your tests here.
-
 class EventAndSessionApiTests(APITestCase):
     def setUp(self):
         self.admin = UserFactory(is_staff=True, is_superuser=True, is_active=True)
@@ -293,3 +294,71 @@ class EventAndSessionApiTests(APITestCase):
         with self.subTest('failed - not found'):
             response = self.client.delete('/api/session/500/')
             self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+
+class SessionPurchaseApiTests(APITestCase):
+    def setUp(self):
+        self.example_venue = VenueFactory()
+        self.example_track = TrackFactory(venue=self.example_venue)
+        for _ in range(3):
+            EventFactory(track=self.example_track)
+        self.sample_session = SessionFactory()
+        self.sample_session.events.set(Event.objects.all())
+        for _ in range(10):
+            UserProfileFactory()
+
+    def test_purchase(self):
+        first_user = get_user_model().objects.first()
+        data = {
+            'attendees': [{
+                'purchaser_email': first_user.email,
+                'purchaser_first_name': first_user.first_name,
+                'purchaser_last_name': first_user.last_name,
+                'purchaser_phone_number': first_user.phone_number,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'phone_number': user.phone_number,
+                'country': 'Indonesia',
+                'birth_date': '1990-01-01',
+                'gender': 'male',
+                'occupation': 'student',
+                'marital_status': 'single',
+            } for user in get_user_model().objects.exclude(id=first_user.id)]
+        }
+        with self.subTest('success'):
+            response = self.client.post(f'/api/session/{self.sample_session.id}/purchase/', data, format='json')
+            self.assertEqual(response.status_code, HTTPStatus.CREATED)
+
+
+        other_track = TrackFactory(venue=self.example_venue)
+        for _ in range(3):
+            EventFactory(track=other_track, capacity=2)
+
+        other_session = SessionFactory()
+        other_session.events.set(Event.objects.exclude(sessions__in=[self.sample_session.id]))
+        with self.subTest('failed - session capacity not enough'):
+            response = self.client.post(f'/api/session/{other_session.id}/purchase/', data, format='json')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+            self.assertEqual(response_data.get('details', {}).get('main_error', {}),
+                             "Attendee registered was exceeded the capacity of this session.")
+
+        with self.subTest('failed - bad request'):
+            data['attendees'] = [{
+                'purchaser_email': first_user.email,
+                'purchaser_first_name': first_user.first_name,
+                'purchaser_last_name': first_user.last_name,
+                'purchaser_phone_number': first_user.phone_number,
+                'last_name': user.last_name,
+                'phone_number': user.phone_number,
+                'country': 'Indonesia',
+                'birth_date': '1990-01-01',
+                'gender': 'male',
+                'occupation': 'student',
+                'marital_status': 'single',
+            } for user in get_user_model().objects.exclude(id=first_user.id)]
+            response = self.client.post(f'/api/session/{other_session.id}/purchase/', data, format='json')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+            self.assertIsNotNone(response_data.get('details', {}).get('field_errors', {}).get('attendees'))

@@ -4,13 +4,18 @@ from rest_framework import serializers
 from api.session_management.models import Event, Session, Speaker
 from api.track.models import Track
 from api.track.serializers import TrackSerializer
+from api.utils.validators import PhoneNumberValidator
 
 
 class EventSerializer(serializers.ModelSerializer):
     track = TrackSerializer()
     speakers = serializers.SerializerMethodField()
 
-    def get_speakers(self, obj):
+    def get_speakers(self, obj: Event):
+        '''
+        :param obj: event object
+        :return: short information regarding the speakers
+        '''
         speakers = obj.speakers.select_related('profile')
         return [{
             'name': speaker.profile.get_full_name(),
@@ -90,7 +95,12 @@ class SessionSerializer(serializers.ModelSerializer):
     events = EventSerializer(many=True)
     capacity = serializers.SerializerMethodField()
 
-    def get_capacity(self, obj):
+    def get_capacity(self, obj: Session) -> int:
+        '''
+
+        :param obj: session object
+        :return: total capacity of the session from all events
+        '''
         return obj.get_capacity()
 
     class Meta:
@@ -112,3 +122,32 @@ class CreateAndUpdateSessionSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("This field is required.")
         return value
+
+
+class AttendeeSerializer(serializers.Serializer):
+    purchaser_email = serializers.EmailField()
+    purchaser_first_name = serializers.CharField(max_length=100)
+    purchaser_last_name = serializers.CharField(max_length=100)
+    purchaser_phone_number = serializers.CharField(validators=[PhoneNumberValidator()])
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    phone_number = serializers.CharField(validators=[PhoneNumberValidator()])
+    country = serializers.CharField(max_length=100)
+    birth_date = serializers.DateField()
+    gender = serializers.CharField(max_length=10)
+    occupation = serializers.CharField(max_length=100)
+    marital_status = serializers.CharField(max_length=10)
+
+
+class SessionPurchaseSerializer(serializers.Serializer):
+    attendees = AttendeeSerializer(many=True)
+
+    def validate_attendees(self, values):
+        if not values:
+            raise serializers.ValidationError("This field is required.")
+
+        return values
+
+
+
