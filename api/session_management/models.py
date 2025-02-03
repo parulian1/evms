@@ -29,8 +29,8 @@ class Session(models.Model):
     session should manage which event that belong to its own and also speaker, etc.
     """
     name = models.CharField(max_length=150, blank=True, null=True)
-    event = models.ManyToManyField(Event, related_name='sessions')
-    speaker = models.ManyToManyField('users.Speaker', related_name='speaker_session')
+    events = models.ManyToManyField(Event, related_name='sessions')
+    speakers = models.ManyToManyField('users.Speaker', related_name='speaker_session')
 
     class Meta:
         db_table = 'event_session'
