@@ -53,8 +53,11 @@ def api_exception_handler(exception: Exception, context: dict) -> Response:
         "status_code": response.status_code,
         "type": "ValidationError",
         "message": http_code_to_message[response.status_code],
-        "field_errors": field_errors,
-        "main_error": main_error
+        "details": {
+            "field_errors": field_errors,
+            "main_error": main_error
+        },
+
     }
 
     # Overwrite default exception_handler response data

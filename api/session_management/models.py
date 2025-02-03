@@ -38,6 +38,9 @@ class Session(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def get_capacity(self):
+        return self.events.aggregate(models.Sum('capacity'))['capacity__sum']
+
 
 class Attendee(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, related_name='attendees')

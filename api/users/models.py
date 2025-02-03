@@ -110,6 +110,9 @@ class Profile(models.Model):
         default=MaritalStatus.single
     )
 
+    def get_full_name(self):
+        return self.user.get_full_name()
+
 
 class Speaker(models.Model):
     class Responsibility(models.TextChoices):
