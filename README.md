@@ -186,3 +186,11 @@ TODO : allowing attendee / user to see their purchased session with information 
 ### Postman
 <hr>   
 You can try API with postman by import the [collection] ... and [environment] ... file
+
+
+### API Documentation (expected to be drf-spectacular but atm can use drf-yasg)
+You can access API Documentation by accessing into web browser at [localhost:8000/api/swagger/](http://localhost:8000/api/swagger/)
+ or at [localhost:8000/api/redoc/](http://localhost:8000/api/redoc/) 
+<br/>
+![swagger-ss.png](swagger-ss.png) <br/>
+![redoc-ss.png](redoc-ss.png)
