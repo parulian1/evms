@@ -189,8 +189,9 @@ You can try API with postman by import the [collection] ... and [environment] ..
 
 
 ### API Documentation (expected to be drf-spectacular but atm can use drf-yasg)
-You can access API Documentation by accessing into web browser at [localhost:8000/api/swagger/](http://localhost:8000/api/swagger/)
- or at [localhost:8000/api/redoc/](http://localhost:8000/api/redoc/) 
+You can access API Documentation by accessing into web browser at
+<br/>[localhost:8000/api/swagger/](http://localhost:8000/api/swagger/)
 <br/>
 ![swagger-ss.png](swagger-ss.png) <br/>
+ or at [localhost:8000/api/redoc/](http://localhost:8000/api/redoc/) <br/>
 ![redoc-ss.png](redoc-ss.png)
