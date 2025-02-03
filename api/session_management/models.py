@@ -37,3 +37,15 @@ class Session(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+
+
+class Attendee(models.Model):
+    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING, related_name='attendees')
+    user = models.ForeignKey('users.User', on_delete=models.DO_NOTHING, related_name='user_attendee')
+    purchaser_email = models.EmailField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'attendee'
+
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name} - {self.session.name}'
