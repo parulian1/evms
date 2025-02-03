@@ -40,3 +40,6 @@ registration and session scheduling.
 - [ ] Track creation and management
 5. User 
 - [ ] Allowing admin / staff to do CRUD for Event - Session - Track
+- [ ] Allowing to store speaker / attendee / user profile into one table profile. 
+<br/> <br/> 
+TODO : allowing attendee / user to see their purchased session with information of the event that was included
