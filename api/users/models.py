@@ -88,7 +88,7 @@ class Profile(models.Model):
         married = 'married', _('Married')
         single = 'single', _('Single')
 
-    birth_place = models.CharField(_('birth place'), max_length=150, blank=True)
+    country = models.CharField(max_length=150, blank=True)
     birth_date = models.DateField(_('birth date'), blank=True, null=True)
     gender = models.CharField(
         choices=Gender.choices,
