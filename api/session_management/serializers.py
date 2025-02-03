@@ -1,13 +1,34 @@
-from django.apps import apps
 from django.db.models import Q
 from rest_framework import serializers
 
-from api.session_management.models import Event, Session
+from api.session_management.models import Event, Session, Speaker
 from api.track.models import Track
+from api.track.serializers import TrackSerializer
 
 
 class EventSerializer(serializers.ModelSerializer):
+    track = TrackSerializer()
+    speakers = serializers.SerializerMethodField()
+
+    def get_speakers(self, obj):
+        speakers = obj.speakers.select_related('profile').order_by('profile__first_name')
+        return [{
+            'name': speaker.profile.get_full_name(),
+            'role': speaker.role,
+            'occupation': speaker.profile.occupation
+        } for speaker in speakers]
+
+    class Meta:
+        model = Event
+        fields = '__all__'
+
+
+class CreateAndUpdateEventSerializer(serializers.ModelSerializer):
     track = serializers.PrimaryKeyRelatedField(queryset=Track.objects.all())
+    speakers = serializers.PrimaryKeyRelatedField(
+        queryset=Speaker.objects.all(),
+        many=True
+    )
 
     class Meta:
         model = Event
@@ -26,34 +47,43 @@ class EventSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This field is required.")
         return value
 
-    def validate(self, attrs):
-        date = attrs.get('date')
-        track_id = attrs.get('track')
+    def validate_track(self, value):
+        date = self.initial_data.get('date')
+        track_id = value
         existing_events_in_time_occurrence = Event.objects.filter(
             Q(track_id=track_id, date=date),
             Q(
-                Q(start_time__gte=attrs.get('end_time')) |
-                Q(end_time__gte=attrs.get('start_time'))
+                Q(start_time__gte=self.initial_data.get('end_time')) |
+                Q(end_time__gte=self.initial_data.get('start_time'))
             )
         ).exists()
         if existing_events_in_time_occurrence:
             raise serializers.ValidationError("Track already has event at this time, "
                                               "please choose different track or time.")
-        return attrs
+        return value
+
+    def validate_speakers(self, values):
+        if not values:
+            raise serializers.ValidationError("This field is required.")
+        else:
+            date = self.initial_data.get('date')
+            existing_events_in_time_occurrence = Event.objects.filter(
+                Q(date=date),
+                Q(
+                    Q(start_time__gte=self.initial_data.get('end_time')) |
+                    Q(end_time__gte=self.initial_data.get('start_time'))
+                ),
+                Q(speakers__id__in=values)
+            ).exists()
+            if existing_events_in_time_occurrence:
+                raise serializers.ValidationError("Some of the speaker(s) already has event at this time, "
+                                                  "please choose different speaker(s) or time.")
+        return values
 
 
 class SessionSerializer(serializers.ModelSerializer):
     events = EventSerializer(many=True)
-    speakers = serializers.SerializerMethodField()
     capacity = serializers.SerializerMethodField()
-
-    def get_speakers(self, obj):
-        speakers = obj.speakers.prefetch_related('profile').all()
-        return [{
-            'name': speaker.profile.get_full_name(),
-            'role': speaker.role,
-            'occupation': speaker.profile.occupation
-        } for speaker in speakers]
 
     def get_capacity(self, obj):
         return obj.get_capacity()
@@ -68,10 +98,6 @@ class CreateAndUpdateSessionSerializer(serializers.ModelSerializer):
         queryset=Event.objects.all(),
         many=True
     )
-    speakers = serializers.PrimaryKeyRelatedField(
-        queryset=apps.get_model('users', 'speaker').objects.all(),
-        many=True
-    )
 
     class Meta:
         model = Session
@@ -81,10 +107,3 @@ class CreateAndUpdateSessionSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("This field is required.")
         return value
-
-    def validate_speakers(self, value):
-        if not value:
-            raise serializers.ValidationError("This field is required.")
-        return value
-
-

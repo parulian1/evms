@@ -4,9 +4,9 @@ import factory
 from factory import fuzzy
 from django.contrib.auth import get_user_model
 
-from api.session_management.models import Event, Session
+from api.session_management.models import Event, Session, Speaker
 from api.track.models import Venue, Track
-from api.users.models import Profile, Speaker
+from api.users.models import Profile
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -52,6 +52,14 @@ class TrackFactory(factory.django.DjangoModelFactory):
         model = Track
 
 
+class SpeakerFactory(factory.django.DjangoModelFactory):
+    profile = factory.SubFactory(UserProfileFactory)
+    role = fuzzy.FuzzyChoice([x[0] for x in Speaker.Responsibility.choices])
+
+    class Meta:
+        model = Speaker
+
+
 class EventFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('name')
     description = factory.Faker('text')
@@ -64,13 +72,19 @@ class EventFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Event
 
-
-class SpeakerFactory(factory.django.DjangoModelFactory):
-    profile = factory.SubFactory(UserProfileFactory)
-    role = fuzzy.FuzzyChoice([x[0] for x in Speaker.Responsibility.choices])
-
-    class Meta:
-        model = Speaker
+    @factory.post_generation
+    def create_speakers(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if not extracted:
+            if not Speaker.objects.exists():
+                self.speakers.add(SpeakerFactory())
+            else:
+                for speaker in Speaker.objects.all()[0:randint(1, Speaker.objects.count())]:
+                    self.speakers.add(speaker)
+        else:
+            for p in extracted:
+                self.speakers.add(p)
 
 
 class SessionFactory(factory.django.DjangoModelFactory):
@@ -93,16 +107,4 @@ class SessionFactory(factory.django.DjangoModelFactory):
             for p in extracted:
                 self.events.add(p)
 
-    @factory.post_generation
-    def create_speakers(self, create, extracted, **kwargs):
-        if not create:
-            return
-        if not extracted:
-            if not Speaker.objects.exists():
-                self.speakers.add(SpeakerFactory())
-            else:
-                for speaker in Speaker.objects.all()[0:randint(1, Speaker.objects.count())]:
-                    self.speakers.add(speaker)
-        else:
-            for p in extracted:
-                self.speakers.add(p)
+

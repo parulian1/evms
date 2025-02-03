@@ -114,24 +114,7 @@ class Profile(models.Model):
         return self.user.get_full_name()
 
 
-class Speaker(models.Model):
-    class Responsibility(models.TextChoices):
-        HOST = 'host', _('Host')
-        PARTICIPANT = 'participant', _('Prefer Not to Say')
-    profile = models.ForeignKey('Profile', on_delete=models.DO_NOTHING, related_name='speaker_profile')
-    role = models.CharField(
-        choices=Responsibility.choices,
-        max_length=50,
-        blank=True,
-        default=Responsibility.HOST
-    )
 
-    class Meta:
-        db_table = 'speaker'
-
-    def __str__(self):
-        user = self.profile.user
-        return f'{user.first_name} {user.last_name} - {self.roles}'
 
 
 

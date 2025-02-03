@@ -3,8 +3,7 @@ from http import HTTPStatus
 
 from rest_framework.test import APITestCase
 
-from api.session_management.models import Event
-from api.users.models import Speaker
+from api.session_management.models import Event, Speaker
 from api.utils.fakers import UserFactory, VenueFactory, TrackFactory, EventFactory, SpeakerFactory, SessionFactory
 
 
