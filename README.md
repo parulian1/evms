@@ -43,3 +43,146 @@ registration and session scheduling.
 - [ ] Allowing to store speaker / attendee / user profile into one table profile. 
 <br/> <br/> 
 TODO : allowing attendee / user to see their purchased session with information of the event that was included
+
+### Requirements
+<hr>
+
+1. Django 5.0+
+2. Django REST Framework
+3. PostgreSQL
+4. JWT authentication
+
+### Local Configuration
+<hr>
+
+1. clone source code from github
+
+2. go to project directory
+
+   ```shell
+   cd evms
+   ```
+
+3. create your own project env
+   ```shell
+   python3.10 -m venv env
+   ```
+
+4. activate your project env
+   ``` shell
+   source env/bin/activate
+   ```
+
+5. go to your project directory and install requirement.txt
+
+   ```shell
+   pip install requirement.txt
+   ```
+   
+6. run docker compose
+
+   ```shell
+   docker compose up -d
+   ```
+
+7. migrate all models to database.
+
+   ```shell
+   python3 manage.py migrate
+   ```
+   
+8. then run the apps.
+   ```shell
+   python3 manage.py runserver
+   ```
+   
+### Run The Test and Coverage
+<hr>
+
+1. run test case.
+   ```shell
+   python3.10 manage.py test
+   ```
+   
+   the output should be like this:
+   ```shell
+   Found 22 test(s).
+   Creating test database for alias 'default'...
+   System check identified no issues (0 silenced).
+   ......................
+   ----------------------------------------------------------------------
+   Ran 22 tests in 15.919s
+
+   OK
+   Destroying test database for alias 'default'...
+   ```
+   
+2. run test coverage.
+   ```shell
+   coverage-3.10 run --source='.' manage.py test api
+   coverage report
+   ```
+   
+    the output should be like this:
+   ```shell
+   Found 22 test(s).
+   Creating test database for alias 'default'...
+   System check identified no issues (0 silenced).
+   ......................
+   ----------------------------------------------------------------------
+   Ran 22 tests in 19.112s
+
+   OK
+   Destroying test database for alias 'default'...
+   
+   Name                                                Stmts   Miss  Cover
+   -----------------------------------------------------------------------
+    api/__init__.py                                         0      0   100%
+    api/session_management/__init__.py                      0      0   100%
+    api/session_management/admin.py                         1      1     0%
+    api/session_management/apps.py                          4      0   100%
+    api/session_management/migrations/0001_initial.py       5      0   100%
+    api/session_management/migrations/0002_initial.py       7      0   100%
+    api/session_management/migrations/__init__.py           0      0   100%
+    api/session_management/models.py                       46      5    89%
+    api/session_management/serializers.py                  87      2    98%
+    api/session_management/tests.py                       224      0   100%
+    api/session_management/views.py                        83      7    92%
+    api/track/__init__.py                                   0      0   100%
+    api/track/admin.py                                      1      1     0%
+    api/track/apps.py                                       4      0   100%
+    api/track/migrations/0001_initial.py                    6      0   100%
+    api/track/migrations/__init__.py                        0      0   100%
+    api/track/models.py                                    22      2    91%
+    api/track/serializers.py                               13      0   100%
+    api/track/tests.py                                    112      0   100%
+    api/track/views.py                                     12      0   100%
+    api/urls.py                                            21      0   100%
+    api/users/__init__.py                                   0      0   100%
+    api/users/admin.py                                      1      1     0%
+    api/users/apps.py                                       4      0   100%
+    api/users/migrations/0001_initial.py                   10      0   100%
+    api/users/migrations/__init__.py                        0      0   100%
+    api/users/models.py                                    62     25    60%
+    api/users/serializers.py                               47      3    94%
+    api/users/tests.py                                     47      0   100%
+    api/users/views.py                                     23      1    96%
+    api/utils/__init__.py                                   0      0   100%
+    api/utils/custom_jwt.py                                34     34     0%
+    api/utils/fakers.py                                    80      7    91%
+    api/utils/helpers.py                                   32     10    69%
+    api/utils/permissions.py                               14      0   100%
+    api/utils/validators.py                                14      2    86%
+    evms/__init__.py                                        0      0   100%
+    evms/asgi.py                                            4      4     0%
+    evms/settings.py                                       22      0   100%
+    evms/urls.py                                            2      0   100%
+    evms/wsgi.py                                            4      4     0%
+    manage.py                                              11      2    82%
+   -----------------------------------------------------------------------
+    TOTAL                                                1059    111    90%
+   ```
+
+### Postman
+<hr>   
+You can try API with postman by import the [collection] ... and [environment] ... file
