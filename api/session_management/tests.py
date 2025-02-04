@@ -4,6 +4,8 @@ from http import HTTPStatus
 from django.contrib.auth import get_user_model
 from rest_framework.test import APITestCase
 
+from faker import Faker
+
 from api.session_management.models import Event, Speaker
 from api.utils.fakers import UserFactory, VenueFactory, TrackFactory, EventFactory, SpeakerFactory, SessionFactory, \
     UserProfileFactory
@@ -32,9 +34,9 @@ class EventAndSessionApiTests(APITestCase):
             'name': 'test event',
             'capacity': self.example_track.capacity - 2,
             'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
-            'date': current_date,
-            'start_time': current_time,
-            'end_time': (current_datetime + timedelta(minutes=120)).time(),
+            'date': current_date.isoformat(),
+            'start_time': current_time.isoformat(),
+            'end_time': (current_datetime + timedelta(minutes=120)).time().isoformat(),
         }
         with self.subTest('success'):
             response = self.client.post('/api/event/', request_data)
@@ -330,7 +332,6 @@ class SessionPurchaseApiTests(APITestCase):
             response = self.client.post(f'/api/session/{self.sample_session.id}/purchase/', data, format='json')
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
-
         other_track = TrackFactory(venue=self.example_venue)
         for _ in range(3):
             EventFactory(track=other_track, capacity=2)
@@ -362,3 +363,135 @@ class SessionPurchaseApiTests(APITestCase):
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertIsNotNone(response_data.get('details', {}).get('field_errors', {}).get('attendees'))
+
+
+class SpeakerApiTests(APITestCase):
+    def setUp(self):
+        self.admin = UserFactory(is_staff=True, is_superuser=True, is_active=True)
+        self.faker = Faker('id_ID')
+        self.email = self.faker.email()
+        self.first_name = self.faker.first_name()
+        self.last_name = self.faker.last_name()
+        self.phone_number = self.faker.phone_number()
+        self.country = self.faker.country()
+        self.birth_date = self.faker.date_of_birth()
+        self.gender = self.faker.random_element(elements=('male', 'female'))
+        self.occupation = self.faker.job()
+        self.marital_status = self.faker.random_element(elements=('single', 'married'))
+        self.example_speaker = SpeakerFactory()
+
+    def test_create_speaker(self):
+        self.client.force_authenticate(self.admin)
+        speaker_data = {
+            'profile': {
+                'email': self.email,
+                'first_name': self.first_name,
+                'last_name': self.last_name,
+                'phone_number': self.phone_number,
+                'country': self.country,
+                'birth_date': self.birth_date.isoformat(),
+                'gender': self.gender,
+                'occupation': self.occupation,
+                'marital_status': self.marital_status,
+            },
+            'role': 'participant',
+        }
+        with self.subTest('success'):
+            response = self.client.post('/api/speaker/', speaker_data, format='json')
+            self.assertEqual(response.status_code, HTTPStatus.CREATED)
+
+        with self.subTest('failed - bad request'):
+            response = self.client.post('/api/speaker/', {
+                'profile': {
+                    'email': self.email,
+                    'first_name': self.first_name,
+                    'last_name': self.last_name,
+                    'phone_number': self.phone_number,
+                    'country': self.country,
+                    'birth_date': self.birth_date.isoformat(),
+                    'gender': self.gender,
+                    'occupation': self.occupation,
+                    'marital_status': self.marital_status,
+                },
+            }, format='json')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+            self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('role'),
+                             'This field is required.')
+
+        self.client.logout()
+        with self.subTest('failed - unauthorized'):
+            response = self.client.post('/api/speaker/', speaker_data, format='json')
+            self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
+
+    def test_update_speaker(self):
+        self.client.force_authenticate(self.admin)
+        speaker_data = {
+            'profile': {
+                'email': self.example_speaker.profile.user.email,
+                'first_name': 'updated first name',
+                'last_name': self.last_name,
+                'phone_number': self.phone_number,
+                'country': self.country,
+                'birth_date': self.birth_date.isoformat(),
+                'gender': self.gender,
+                'occupation': self.occupation,
+                'marital_status': self.marital_status,
+            },
+            'role': 'participant',
+        }
+        with self.subTest('success'):
+            response = self.client.put(f'/api/speaker/{self.example_speaker.id}/', speaker_data, format='json')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertEqual(response_data.get('profile', {}).get('first_name'), 'updated first name')
+
+        with self.subTest('failed - bad request'):
+            speaker_data.pop('role')
+            response = self.client.put(f'/api/speaker/{self.example_speaker.id}/', speaker_data, format='json')
+            self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+        self.client.logout()
+        with self.subTest('failed - unauthorized'):
+            response = self.client.put(f'/api/speaker/{self.example_speaker.id}/', speaker_data, format='json')
+            self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
+
+    def test_get_speaker(self):
+        with self.subTest('list'):
+            response = self.client.get('/api/speaker/')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertTrue(len(response_data))
+
+        with self.subTest('detail'):
+            response = self.client.get(f'/api/speaker/{self.example_speaker.id}/')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.OK)
+            self.assertEqual(response_data.get('role'), self.example_speaker.role)
+
+        with self.subTest('detail - not found'):
+            response = self.client.get('/api/speaker/100/')
+            self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    def test_delete_speaker(self):
+        example_event = EventFactory()
+        example_event.speakers.add(self.example_speaker)
+        example_event.save()
+
+        with self.subTest('failed - unauthorized'):
+            response = self.client.delete(f'/api/speaker/{self.example_speaker.id}/')
+            self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
+
+        self.client.force_authenticate(self.admin)
+        with self.subTest('failed - conflict'):
+            response = self.client.delete(f'/api/speaker/{self.example_speaker.id}/')
+            response_data = response.json()
+            self.assertEqual(response.status_code, HTTPStatus.CONFLICT)
+            self.assertIsNotNone(response_data.get('details', {}).get('main_error'))
+
+        example_event.speakers.remove(self.example_speaker)
+        example_event.save()
+        with self.subTest('success'):
+            response = self.client.delete(f'/api/speaker/{self.example_speaker.id}/')
+            self.assertEqual(response.status_code, HTTPStatus.NO_CONTENT)
+

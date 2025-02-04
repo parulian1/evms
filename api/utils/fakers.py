@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from api.session_management.models import Event, Session, Speaker
 from api.track.models import Venue, Track
 from api.users.models import Profile
+from api.utils.choices import Gender, MaritalStatus, Responsibility
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -24,9 +25,9 @@ class UserProfileFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     country = factory.Faker('city')
     birth_date = factory.Faker('date')
-    gender = fuzzy.FuzzyChoice([x[0] for x in Profile.Gender.choices])
+    gender = fuzzy.FuzzyChoice([x[0] for x in Gender.choices])
     occupation  = factory.Faker('job')
-    marital_status = fuzzy.FuzzyChoice([x[0] for x in Profile.MaritalStatus.choices])
+    marital_status = fuzzy.FuzzyChoice([x[0] for x in MaritalStatus.choices])
 
     class Meta:
         model = Profile
@@ -55,7 +56,7 @@ class TrackFactory(factory.django.DjangoModelFactory):
 
 class SpeakerFactory(factory.django.DjangoModelFactory):
     profile = factory.SubFactory(UserProfileFactory)
-    role = fuzzy.FuzzyChoice([x[0] for x in Speaker.Responsibility.choices])
+    role = fuzzy.FuzzyChoice([x[0] for x in Responsibility.choices])
 
     class Meta:
         model = Speaker

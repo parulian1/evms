@@ -4,6 +4,7 @@ from rest_framework import serializers
 from api.session_management.models import Event, Session, Speaker
 from api.track.models import Track
 from api.track.serializers import TrackSerializer
+from api.utils.choices import Gender, MaritalStatus, Responsibility
 from api.utils.validators import PhoneNumberValidator
 
 
@@ -150,4 +151,30 @@ class SessionPurchaseSerializer(serializers.Serializer):
         return values
 
 
+class SpeakerSerializer(serializers.ModelSerializer):
+    events = serializers.SerializerMethodField()
 
+    def get_events(self, obj: Speaker):
+        events = obj.speaker_events.all()
+        return EventSerializer(events, many=True).data
+
+    class Meta:
+        model = Speaker
+        fields = '__all__'
+
+
+class UserAndProfileSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=100)
+    last_name = serializers.CharField(max_length=100)
+    phone_number = serializers.CharField(validators=[PhoneNumberValidator()])
+    country = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    birth_date = serializers.DateField(required=False, allow_null=True)
+    gender = serializers.ChoiceField(Gender.choices, required=False, allow_null=True)
+    occupation  = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    marital_status = serializers.ChoiceField(MaritalStatus.choices, required=False, allow_null=True)
+
+
+class CreateAndUpdateSpeakerSerializer(serializers.Serializer):
+    profile = UserAndProfileSerializer()
+    role = serializers.ChoiceField(Responsibility.choices)

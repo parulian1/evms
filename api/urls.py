@@ -11,7 +11,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 # from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-from api.session_management.views import EventViewSet, SessionViewSet, SessionPurchaseViewSet
+from api.session_management.views import EventViewSet, SessionViewSet, SessionPurchaseViewSet, SpeakerViewSet
 from api.track.views import VenueViewSet, TrackViewSet
 from api.users.views import CustomObtainTokenPairView, RegistrationView, UserProfileView
 
@@ -23,6 +23,8 @@ router.register(r'track', TrackViewSet, basename='track')
 
 router.register(r'event', EventViewSet, basename='event')
 router.register(r'session', SessionViewSet, basename='session')
+
+router.register(r'speaker', SpeakerViewSet, basename='speaker')
 
 session_router = NestedDefaultRouter(router, 'session', lookup='session')
 session_router.register(r'purchase', SessionPurchaseViewSet, basename='session-purchase')

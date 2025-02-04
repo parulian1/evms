@@ -5,6 +5,8 @@ from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from api.utils.choices import Gender, MaritalStatus
+
 
 def get_username(instance):
     """ Used for auto-slug functionality -- returns the username portion of
@@ -78,16 +80,6 @@ class Profile(models.Model):
     """
         Additional user profile data.
     """
-
-    class Gender(models.TextChoices):
-        MALE = 'male', _('Male')
-        FEMALE = 'female', _('Female')
-        NOT_SPECIFIED = '', _('Prefer Not to Say')
-
-    class MaritalStatus(models.TextChoices):
-        married = 'married', _('Married')
-        single = 'single', _('Single')
-
     country = models.CharField(max_length=150, blank=True)
     birth_date = models.DateField(_('birth date'), blank=True, null=True)
     gender = models.CharField(
@@ -107,7 +99,7 @@ class Profile(models.Model):
         choices=MaritalStatus.choices,
         max_length=10,
         blank=True,
-        default=MaritalStatus.single
+        default=MaritalStatus.SINGLE
     )
 
     def get_full_name(self):

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_simplejwt',
     'drf_yasg',
     # 'drf_spectacular',
     # 'drf_spectacular_sidecar',
@@ -145,7 +146,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'URL_FIELD_NAME': 'href',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # 'rest_framework.authentication.BasicAuthentication',
     ),
     'EXCEPTION_HANDLER': 'api.utils.helpers.api_exception_handler',
     'DEFAULT_PERMISSION_CLASSES': (
@@ -160,7 +162,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(weeks=2),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
-    'USER_ID_FIELD': 'email'
+    'USER_ID_FIELD': 'email',
+    'AUTH_HEADER_TYPES': ('Bearer', 'JWT'),
 }
 
 # SPECTACULAR_SETTINGS = {

@@ -1,7 +1,24 @@
 from typing import Optional
-from rest_framework_simplejwt.authentication import JWTAuthentication, AUTH_HEADER_TYPE_BYTES
+
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from rest_framework.exceptions import AuthenticationFailed
 from django.utils.translation import gettext as _
+
+
+def jwt_token_with_extra_kwargs(user):
+    """ return RefreshToken instance, with additional kwargs (attributes) """
+    token = RefreshToken.for_user(user)
+    token['is_staff'] = user.is_staff
+    token['first_name'] = user.first_name
+    token['last_name'] = user.last_name
+    token['email'] = user.email
+    token['groups'] = [
+        acg.name for acg in user.groups.all()
+    ]
+    token['is_superuser'] = user.is_superuser
+    return token
 
 
 class CustomJWTAuthentication(JWTAuthentication):

@@ -1,11 +1,11 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+
+from api.utils.choices import Responsibility
+
 
 # Create your models here.
 class Speaker(models.Model):
-    class Responsibility(models.TextChoices):
-        HOST = 'host', _('Host')
-        PARTICIPANT = 'participant', _('Prefer Not to Say')
+
     profile = models.ForeignKey('users.Profile', on_delete=models.DO_NOTHING, related_name='speaker_profile')
     role = models.CharField(
         choices=Responsibility.choices,
@@ -18,8 +18,7 @@ class Speaker(models.Model):
         db_table = 'speaker'
 
     def __str__(self):
-        user = self.profile.user
-        return f'{user.first_name} {user.last_name} - {self.role}'
+        return f'{self.profile.get_full_name()} - {self.role}'
 
 
 class Event(models.Model):

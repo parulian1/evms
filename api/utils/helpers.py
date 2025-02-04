@@ -5,6 +5,9 @@ from rest_framework import exceptions, serializers
 from rest_framework.views import Response, exception_handler
 
 
+http_code_to_message = {v.value: v.description for v in HTTPStatus}
+
+
 def get_entity_href_serializer(model_class, meta_extra_kwargs=None, *init_args, **init_kwargs):
     class EntityHrefSerializer(serializers.HyperlinkedModelSerializer):
         name = serializers.CharField(required=False)
@@ -49,8 +52,6 @@ def api_exception_handler(exception: Exception, context: dict) -> Response:
             main_error = ','.join(details)
 
     # Using the description's of the HTTPStatus class as error message.
-    http_code_to_message = {v.value: v.description for v in HTTPStatus}
-
     error_payload = {
         "status_code": response.status_code,
         "type": "ValidationError",

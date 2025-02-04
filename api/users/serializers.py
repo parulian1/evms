@@ -6,6 +6,7 @@ from rest_framework.validators import UniqueValidator
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from api.users.models import Profile
+from api.utils.custom_jwt import jwt_token_with_extra_kwargs
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -60,11 +61,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     @classmethod
     def get_token(cls, user):
-        token = super(CustomTokenObtainPairSerializer, cls).get_token(user)
+        return jwt_token_with_extra_kwargs(user)
 
-        # Add custom claims
-        token['username'] = user.username
-        return token
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+
+        return data
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -84,5 +91,17 @@ class UserSerializer(serializers.ModelSerializer):
         if profile is None:
             return {}
         return ProfileSerializer(profile).data
+
+
+class TokenObtainPairResponseSerializer(serializers.Serializer):
+    access = serializers.CharField()
+    refresh = serializers.CharField()
+
+    def create(self, validated_data):
+        raise NotImplementedError()
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError()
+
 
 
