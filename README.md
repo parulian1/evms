@@ -30,7 +30,7 @@ registration and session scheduling.
 - [ ] Handling track and speaker time to avoid conflict
 2. Session Management
 - [ ] Schedule sessions within events
-- [ ] Allowing events to be bundled as one or separate session and attendee will purchase / register into this session 
+- [ ] Allowing events to be bundled as one or separate session and attendee will purchase / register into this session
 3. Attendee Registration
 - [ ] Handle attendee registration
 - [ ] Enforce combined event capacity at session as limit 
@@ -41,6 +41,9 @@ registration and session scheduling.
 5. User 
 - [ ] Allowing admin / staff to do CRUD for Event - Session - Track
 - [ ] Allowing to store speaker / attendee / user profile into one table profile. 
+6. Speaker
+- [ ] Allowing admin / staff to do CRUD for Speaker (model inside of session management app)
+- [ ] Add restriction to not allow deletion of speaker attached to event 
 <br/> <br/> 
 TODO : allowing attendee / user to see their purchased session with information of the event that was included
 
@@ -88,12 +91,12 @@ TODO : allowing attendee / user to see their purchased session with information 
 7. migrate all models to database.
 
    ```shell
-   python3 manage.py migrate
+   python3.10 manage.py migrate
    ```
    
 8. then run the apps.
    ```shell
-   python3 manage.py runserver
+   python3.10 manage.py runserver
    ```
    
 ### Run The Test and Coverage
@@ -106,13 +109,13 @@ TODO : allowing attendee / user to see their purchased session with information 
    
    the output should be like this:
    ```shell
-   Found 22 test(s).
+   Found 26 test(s).
    Creating test database for alias 'default'...
    System check identified no issues (0 silenced).
-   ......................
+   ..........................
    ----------------------------------------------------------------------
-   Ran 22 tests in 15.919s
-
+   Ran 26 tests in 21.056s
+   
    OK
    Destroying test database for alias 'default'...
    ```
@@ -125,67 +128,67 @@ TODO : allowing attendee / user to see their purchased session with information 
    
     the output should be like this:
    ```shell
-   Found 22 test(s).
+   Found 26 test(s).
    Creating test database for alias 'default'...
    System check identified no issues (0 silenced).
-   ......................
+   ..........................
    ----------------------------------------------------------------------
-   Ran 22 tests in 19.112s
-
-   OK
-   Destroying test database for alias 'default'...
+   Ran 26 tests in 25.189s
    
+   OK
    Name                                                Stmts   Miss  Cover
    -----------------------------------------------------------------------
-    api/__init__.py                                         0      0   100%
-    api/session_management/__init__.py                      0      0   100%
-    api/session_management/admin.py                         1      1     0%
-    api/session_management/apps.py                          4      0   100%
-    api/session_management/migrations/0001_initial.py       5      0   100%
-    api/session_management/migrations/0002_initial.py       7      0   100%
-    api/session_management/migrations/__init__.py           0      0   100%
-    api/session_management/models.py                       46      5    89%
-    api/session_management/serializers.py                  87      2    98%
-    api/session_management/tests.py                       224      0   100%
-    api/session_management/views.py                        83      7    92%
-    api/track/__init__.py                                   0      0   100%
-    api/track/admin.py                                      1      1     0%
-    api/track/apps.py                                       4      0   100%
-    api/track/migrations/0001_initial.py                    6      0   100%
-    api/track/migrations/__init__.py                        0      0   100%
-    api/track/models.py                                    22      2    91%
-    api/track/serializers.py                               13      0   100%
-    api/track/tests.py                                    112      0   100%
-    api/track/views.py                                     12      0   100%
-    api/urls.py                                            21      0   100%
-    api/users/__init__.py                                   0      0   100%
-    api/users/admin.py                                      1      1     0%
-    api/users/apps.py                                       4      0   100%
-    api/users/migrations/0001_initial.py                   10      0   100%
-    api/users/migrations/__init__.py                        0      0   100%
-    api/users/models.py                                    62     25    60%
-    api/users/serializers.py                               47      3    94%
-    api/users/tests.py                                     47      0   100%
-    api/users/views.py                                     23      1    96%
-    api/utils/__init__.py                                   0      0   100%
-    api/utils/custom_jwt.py                                34     34     0%
-    api/utils/fakers.py                                    80      7    91%
-    api/utils/helpers.py                                   32     10    69%
-    api/utils/permissions.py                               14      0   100%
-    api/utils/validators.py                                14      2    86%
-    evms/__init__.py                                        0      0   100%
-    evms/asgi.py                                            4      4     0%
-    evms/settings.py                                       22      0   100%
-    evms/urls.py                                            2      0   100%
-    evms/wsgi.py                                            4      4     0%
-    manage.py                                              11      2    82%
+   api/__init__.py                                         0      0   100%
+   api/session_management/__init__.py                      0      0   100%
+   api/session_management/admin.py                         1      1     0%
+   api/session_management/apps.py                          4      0   100%
+   api/session_management/migrations/0001_initial.py       5      0   100%
+   api/session_management/migrations/0002_initial.py       7      0   100%
+   api/session_management/migrations/__init__.py           0      0   100%
+   api/session_management/models.py                       42      4    90%
+   api/session_management/serializers.py                 109      2    98%
+   api/session_management/tests.py                       302      0   100%
+   api/session_management/views.py                       143      7    95%
+   api/track/__init__.py                                   0      0   100%
+   api/track/admin.py                                      1      1     0%
+   api/track/apps.py                                       4      0   100%
+   api/track/migrations/0001_initial.py                    6      0   100%
+   api/track/migrations/__init__.py                        0      0   100%
+   api/track/models.py                                    22      2    91%
+   api/track/serializers.py                               13      0   100%
+   api/track/tests.py                                    112      0   100%
+   api/track/views.py                                     12      0   100%
+   api/urls.py                                            22      0   100%
+   api/users/__init__.py                                   0      0   100%
+   api/users/admin.py                                      1      1     0%
+   api/users/apps.py                                       4      0   100%
+   api/users/migrations/0001_initial.py                   10      0   100%
+   api/users/migrations/__init__.py                        0      0   100%
+   api/users/models.py                                    56     25    55%
+   api/users/serializers.py                               59      5    92%
+   api/users/tests.py                                     47      0   100%
+   api/users/views.py                                     31      1    97%
+   api/utils/__init__.py                                   0      0   100%
+   api/utils/choices.py                                   12      0   100%
+   api/utils/custom_jwt.py                                44     26    41%
+   api/utils/fakers.py                                    81      7    91%
+   api/utils/helpers.py                                   32     10    69%
+   api/utils/permissions.py                               14      0   100%
+   api/utils/serializers.py                                9      0   100%
+   api/utils/validators.py                                14      2    86%
+   evms/__init__.py                                        0      0   100%
+   evms/asgi.py                                            4      4     0%
+   evms/settings.py                                       22      0   100%
+   evms/urls.py                                            2      0   100%
+   evms/wsgi.py                                            4      4     0%
+   manage.py                                              11      2    82%
    -----------------------------------------------------------------------
-    TOTAL                                                1059    111    90%
+   TOTAL                                                1262    104    92%
    ```
 
 ### Postman
 <hr>   
-You can try API with postman by import the [collection] ... and [environment] ... file
+You can try API with postman by import the [evms-collection.postman_collection.json](evms-collection.postman_collection.json)  and [evms.postman_environment.json](evms.postman_environment.json) file
 
 
 ### API Documentation (expected to be drf-spectacular but atm can use drf-yasg)

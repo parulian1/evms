@@ -1,0 +1,520 @@
+{
+	"info": {
+		"_postman_id": "d7148d3a-2fd1-4ae9-988b-7fdd3eb93484",
+		"name": "evms-collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "9042751"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{USER_EMAIL}}\",\n  \"password\": \"{{USER_PASSWORD}}\",\n  \"first_name\": \"string\",\n  \"last_name\": \"string\",\n  \"phone_number\": \"string\",\n  \"is_guest\": false,\n  \"is_staff\": true,\n  \"profile\": {\n    \"country\": \"string\",\n    \"birth_date\": \"2019-08-24\",\n    \"gender\": \"male\",\n    \"occupation\": \"string\",\n    \"marital_status\": \"married\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/users/register/"
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set('token', jsonData.access);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"{{USER_EMAIL}}\",\n    \"password\": \"{{USER_PASSWORD}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/users/login/"
+					},
+					"response": []
+				},
+				{
+					"name": "profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": "{{BASE_URL}}/api/users/profile/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "venue-track",
+			"item": [
+				{
+					"name": "create venue",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"string\",\n  \"location\": \"string\",\n  \"description\": \"string\",\n  \"is_available\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/venue/"
+					},
+					"response": []
+				},
+				{
+					"name": "venue list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/venue/"
+					},
+					"response": []
+				},
+				{
+					"name": "venue detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/venue/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "venue update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"string1\",\n  \"location\": \"string\",\n  \"description\": \"string\",\n  \"is_available\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/venue/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "create track",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"venue\": 1,\n\"name\": \"string\",\n\"description\": \"string\",\n\"is_available\": true,\n\"capacity\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/track/"
+					},
+					"response": []
+				},
+				{
+					"name": "update track",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"venue\": 1,\n\"name\": \"string1\",\n\"description\": \"string\",\n\"is_available\": true,\n\"capacity\": 100\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/track/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "track list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/track/"
+					},
+					"response": []
+				},
+				{
+					"name": "track detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/track/1/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "event-session-speaker",
+			"item": [
+				{
+					"name": "speaker registration",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"profile\": {\n    \"birth_date\": \"1972-02-06\",\n    \"country\": \"Monako\",\n    \"email\": \"jatisaragih@example.net\",\n    \"first_name\": \"Pranawa\",\n    \"gender\": \"male\",\n    \"last_name\": \"Adriansyah\",\n    \"marital_status\": \"single\",\n    \"occupation\": \"Broadcast engineer\",\n    \"phone_number\": \"+62-0095-483-2849\"\n  },\n  \"role\": \"participant\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/speaker/"
+					},
+					"response": []
+				},
+				{
+					"name": "speaker update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"profile\": {\n    \"birth_date\": \"1972-02-06\",\n    \"country\": \"Monako\",\n    \"email\": \"jatisaragih@example.net\",\n    \"first_name\": \"Pranawa\",\n    \"gender\": \"male\",\n    \"last_name\": \"Adriansyah\",\n    \"marital_status\": \"single\",\n    \"occupation\": \"Broadcast engineer\",\n    \"phone_number\": \"+62-0095-483-2849\"\n  },\n  \"role\": \"participant\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/speaker/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "speaker list",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": "{{BASE_URL}}/api/speaker/"
+					},
+					"response": []
+				},
+				{
+					"name": "speaker detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": "{{BASE_URL}}/api/speaker/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "event creation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"capacity\": 15,\n  \"date\": \"2025-02-04\",\n  \"end_time\": \"09:50:15.833222\",\n  \"name\": \"test event\",\n  \"speakers\": [\n    1,\n    2\n  ],\n  \"start_time\": \"07:50:15.833222\",\n  \"track\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/event/"
+					},
+					"response": []
+				},
+				{
+					"name": "event update",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"capacity\": 15,\n  \"date\": \"2025-02-04\",\n  \"end_time\": \"09:50:15.833222\",\n  \"name\": \"test event\",\n  \"speakers\": [\n    1,\n    2\n  ],\n  \"start_time\": \"07:50:15.833222\",\n  \"track\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/event/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "event list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/event/"
+					},
+					"response": []
+				},
+				{
+					"name": "event detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}/api/event/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "session creation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"events\": [\n    12,\n    13\n  ],\n  \"name\": \"test session\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/session/"
+					},
+					"response": []
+				},
+				{
+					"name": "session update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "JWT {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"events\": [\n    12,\n    13\n  ],\n  \"name\": \"test session\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/session/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "session list",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/session/"
+					},
+					"response": []
+				},
+				{
+					"name": "session detail",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/session/1/"
+					},
+					"response": []
+				},
+				{
+					"name": "session purchase - attendee",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"attendees\": [\n    {\n      \"birth_date\": \"1990-01-01\",\n      \"country\": \"Indonesia\",\n      \"email\": \"jennifer38@example.com\",\n      \"first_name\": \"Martha\",\n      \"gender\": \"male\",\n      \"last_name\": \"Wolfe\",\n      \"marital_status\": \"single\",\n      \"occupation\": \"student\",\n      \"phone_number\": \"+62 (12) 644-9017\",\n      \"purchaser_email\": \"thorntonkatrina@example.com\",\n      \"purchaser_first_name\": \"Aaron\",\n      \"purchaser_last_name\": \"Perez\",\n      \"purchaser_phone_number\": \"+62 (095) 461-2755\"\n    },\n    {\n      \"birth_date\": \"1990-01-01\",\n      \"country\": \"Indonesia\",\n      \"email\": \"bjoyce@example.com\",\n      \"first_name\": \"Christopher\",\n      \"gender\": \"male\",\n      \"last_name\": \"Mcgee\",\n      \"marital_status\": \"single\",\n      \"occupation\": \"student\",\n      \"phone_number\": \"(0287) 993-2579\",\n      \"purchaser_email\": \"thorntonkatrina@example.com\",\n      \"purchaser_first_name\": \"Aaron\",\n      \"purchaser_last_name\": \"Perez\",\n      \"purchaser_phone_number\": \"+62 (095) 461-2755\"\n    },\n    {\n      \"birth_date\": \"1990-01-01\",\n      \"country\": \"Indonesia\",\n      \"email\": \"kelsey80@example.com\",\n      \"first_name\": \"Wyatt\",\n      \"gender\": \"male\",\n      \"last_name\": \"Williams\",\n      \"marital_status\": \"single\",\n      \"occupation\": \"student\",\n      \"phone_number\": \"+62-0812-169-6572\",\n      \"purchaser_email\": \"thorntonkatrina@example.com\",\n      \"purchaser_first_name\": \"Aaron\",\n      \"purchaser_last_name\": \"Perez\",\n      \"purchaser_phone_number\": \"+62 (095) 461-2755\"\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}/api/session/1/purchase/"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
