@@ -188,7 +188,7 @@ TODO : allowing attendee / user to see their purchased session with information 
 
 ### Postman
 <hr>   
-You can try API with postman by import the [evms-collection.postman_collection.json](evms-collection.postman_collection.json)  and [evms.postman_environment.json](evms.postman_environment.json) file
+You can try API with postman by import the [collection](evms-collection.postman_collection.json) and [environment](evms.postman_environment.json) file
 
 
 ### API Documentation (expected to be drf-spectacular but atm can use drf-yasg)
