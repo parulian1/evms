@@ -20,6 +20,7 @@ class EventViewSet(ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [IsStaffOrAdmin | (~IsStaffOrAdmin & IsReadOnly)]
+    lookup_field = 'id'
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
@@ -31,6 +32,7 @@ class SessionViewSet(ModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
     permission_classes = [IsStaffOrAdmin | (~IsStaffOrAdmin & IsReadOnly)]
+    lookup_field = 'id'
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
@@ -47,7 +49,7 @@ class SessionPurchaseViewSet(mixins.CreateModelMixin, GenericViewSet):
         '''
         try:
             return Session.objects.get(
-                id=self.kwargs.get('session_pk')
+                id=self.kwargs.get('session_id')
             )
         except Session.DoesNotExist:
             raise Http404()
@@ -131,6 +133,7 @@ class SpeakerViewSet(ModelViewSet):
     queryset = Speaker.objects.all()
     serializer_class = SpeakerSerializer
     permission_classes = [IsStaffOrAdmin | (~IsStaffOrAdmin & IsReadOnly)]
+    lookup_field = 'id'
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':

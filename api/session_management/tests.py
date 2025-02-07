@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from faker import Faker
@@ -24,27 +25,35 @@ class EventAndSessionApiTests(APITestCase):
             SpeakerFactory()
         self.example_session = SessionFactory()
 
+    def generate_entity_data(self, obj):
+        entity_data = {
+            'href': f'http://testserver/api/{obj._meta.model_name}/{obj.id}/'
+        }
+        if hasattr(obj, 'name'):
+            entity_data['name'] = obj.name
+        return entity_data
+
     def test_create_event(self):
         self.client.force_authenticate(self.admin)
         current_datetime = datetime.now()
         current_date = current_datetime.date()
         current_time = current_datetime.time()
         request_data = {
-            'track': self.example_track.id,
+            'track': self.generate_entity_data(self.example_track),
             'name': 'test event',
             'capacity': self.example_track.capacity - 2,
-            'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
+            'speakers': [self.generate_entity_data(speaker) for speaker in Speaker.objects.all()[:2]],
             'date': current_date.isoformat(),
             'start_time': current_time.isoformat(),
             'end_time': (current_datetime + timedelta(minutes=120)).time().isoformat(),
         }
         with self.subTest('success'):
-            response = self.client.post('/api/event/', request_data)
+            response = self.client.post('/api/event/', request_data, format='json')
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
         with self.subTest('failed - capacity not enough'):
             request_data['capacity'] = self.example_track.capacity + 100
-            response = self.client.post('/api/event/', request_data)
+            response = self.client.post('/api/event/', request_data, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('capacity'),
@@ -60,7 +69,7 @@ class EventAndSessionApiTests(APITestCase):
                              start_time=(current_datetime + timedelta(minutes=120 * i)).time(),
                              end_time=(current_datetime + timedelta(minutes=120 * i + 1)).time())
             request_data['capacity'] = self.example_track.capacity
-            response = self.client.post('/api/event/', request_data)
+            response = self.client.post('/api/event/', request_data, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('track'),
@@ -75,14 +84,14 @@ class EventAndSessionApiTests(APITestCase):
             other_event.speakers.add(speaker_a)
             other_event.save()
             other_track = TrackFactory(venue=self.example_venue)
-            request_data['track'] = other_track.id
+            request_data['track'] = self.generate_entity_data(other_track)
             for i in range(3):
                 EventFactory(track=self.example_track, date=current_date,
                              start_time=(current_datetime + timedelta(minutes=120 * i)).time(),
                              end_time=(current_datetime + timedelta(minutes=120 * i + 1)).time())
             request_data['capacity'] = self.example_track.capacity
-            request_data['speakers'].append(speaker_a.id)
-            response = self.client.post('/api/event/', request_data)
+            request_data['speakers'].append(self.generate_entity_data(speaker_a))
+            response = self.client.post('/api/event/', request_data, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('speakers'),
@@ -91,7 +100,7 @@ class EventAndSessionApiTests(APITestCase):
 
         with self.subTest('failed - bad request'):
             request_data.pop('capacity')
-            response = self.client.post('/api/event/', request_data)
+            response = self.client.post('/api/event/', request_data, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('capacity'),
@@ -99,7 +108,7 @@ class EventAndSessionApiTests(APITestCase):
 
         self.client.logout()
         with self.subTest('failed unauthorized'):
-            response = self.client.post('/api/event/', request_data)
+            response = self.client.post('/api/event/', request_data, format='json')
             self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
 
     def test_get_event_detail(self):
@@ -152,8 +161,8 @@ class EventAndSessionApiTests(APITestCase):
         sample_event.save()
         new_track = TrackFactory(venue=self.example_venue)
         updated_data = {
-            'track': new_track.id,
-            'speakers': [speaker.id for speaker in sample_event.speakers.all()],
+            'track': self.generate_entity_data(new_track),
+            'speakers': [self.generate_entity_data(speaker) for speaker in sample_event.speakers.all()],
             'name': 'updated event',
             'capacity': new_track.capacity - 5,
             'date': current_date.isoformat(),
@@ -162,7 +171,7 @@ class EventAndSessionApiTests(APITestCase):
             'end_time': (current_datetime + timedelta(minutes=240)).time().isoformat(),
         }
         with self.subTest('success'):
-            response = self.client.put(f'/api/event/{sample_event.id}/', updated_data)
+            response = self.client.put(f'/api/event/{sample_event.id}/', updated_data, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.OK)
             self.assertEqual(response_data.get('name'), 'updated event')
@@ -174,8 +183,8 @@ class EventAndSessionApiTests(APITestCase):
                 end_time=(current_datetime - timedelta(minutes=240)).time()
             ).exclude(id=sample_event.id).first()
             speaker_already_in_event = other_event.speakers.first()
-            updated_data['speakers'].append(speaker_already_in_event.id)
-            response = self.client.put(f'/api/event/{sample_event.id}/', updated_data)
+            updated_data['speakers'].append(self.generate_entity_data(speaker_already_in_event))
+            response = self.client.put(f'/api/event/{sample_event.id}/', updated_data, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
             self.assertEqual(response_data.get('details', {}).get('field_errors', {}).get('speakers'),
@@ -214,16 +223,16 @@ class EventAndSessionApiTests(APITestCase):
         self.client.force_authenticate(self.admin)
         with self.subTest('success'):
             response = self.client.post('/api/session/', {
-                'events': [event.id for event in Event.objects.all()[:2]],
+                'events': [self.generate_entity_data(event) for event in Event.objects.all()[:2]],
                 'name': 'test session',
-            })
+            }, format='json')
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
         with self.subTest('failed - bad request'):
             response = self.client.post('/api/session/', {
-                'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
+                'speakers': [self.generate_entity_data(speaker) for speaker in Speaker.objects.all()[:2]],
                 'name': 'test session',
-            })
+            }, format='json')
             self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
         self.client.logout()
@@ -231,7 +240,7 @@ class EventAndSessionApiTests(APITestCase):
             response = self.client.post('/api/session/', {
                 'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
                 'name': 'test session',
-            })
+            }, format='json')
             self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
 
     def test_get_session_list(self):
@@ -257,17 +266,15 @@ class EventAndSessionApiTests(APITestCase):
         self.client.force_authenticate(self.admin)
         with self.subTest('success'):
             response = self.client.put(f'/api/session/{self.example_session.id}/', {
-                'events': [event.id for event in Event.objects.all()[:2]],
-                'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
+                'events': [self.generate_entity_data(event) for event in Event.objects.all()[:2]],
                 'name': 'test session updated',
-            })
+            }, format='json')
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.OK)
             self.assertEqual(response_data.get('name'), 'test session updated')
 
         with self.subTest('failed - bad request'):
             response = self.client.put(f'/api/session/{self.example_session.id}/', {
-                'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
                 'name': 'test session',
             })
             response_data = response.json()
@@ -278,7 +285,7 @@ class EventAndSessionApiTests(APITestCase):
         self.client.logout()
         with self.subTest('failed - unauthorized'):
             response = self.client.put(f'/api/session/{self.example_session.id}/', {
-                'speakers': [speaker.id for speaker in Speaker.objects.all()[:2]],
+                'speakers': [self.generate_entity_data(speaker) for speaker in Speaker.objects.all()[:2]],
                 'name': 'test session',
             })
             self.assertEqual(response.status_code, HTTPStatus.UNAUTHORIZED)
@@ -329,9 +336,9 @@ class SessionPurchaseApiTests(APITestCase):
             } for user in get_user_model().objects.exclude(id=first_user.id)]
         }
         with self.subTest('success'):
-            response = self.client.post(f'/api/session/{self.sample_session.id}/purchase/', data, format='json')
+            response = self.client.post(reverse("purchase-list", kwargs={"session_id": self.sample_session.id}),
+                                        data, format='json')
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
-
         other_track = TrackFactory(venue=self.example_venue)
         for _ in range(3):
             EventFactory(track=other_track, capacity=2)
