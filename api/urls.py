@@ -25,7 +25,7 @@ router.register(r'session', SessionViewSet, basename='session')
 router.register(r'speaker', SpeakerViewSet, basename='speaker')
 
 session_router = NestedDefaultRouter(router, 'session', lookup='session')
-session_router.register(r'purchase', SessionPurchaseViewSet, basename='session-purchase')
+session_router.register(r'purchase', SessionPurchaseViewSet, basename='purchase')
 
 schema_view = get_schema_view(
     openapi.Info(
