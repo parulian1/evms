@@ -10,9 +10,11 @@ class VenueViewSet(ModelViewSet):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
     permission_classes = [IsStaffOrAdmin | (~IsStaffOrAdmin & IsReadOnly)]
+    lookup_field = 'id'
 
 
 class TrackViewSet(ModelViewSet):
     queryset = Track.objects.all()
     serializer_class = TrackSerializer
     permission_classes = [IsStaffOrAdmin | (~IsStaffOrAdmin & IsReadOnly)]
+    lookup_field = 'id'

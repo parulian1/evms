@@ -1,9 +1,11 @@
 from http import HTTPStatus
 
 from django.test import TestCase
+from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from api.utils.fakers import UserFactory, VenueFactory, TrackFactory
+from api.utils.helpers import get_entity_id
 
 
 # Create your tests here.
@@ -112,7 +114,7 @@ class VenueTrackApiTests(APITestCase):
 
     def test_venue_list(self):
         response = self.client.get(
-            '/api/venue/'
+            reverse('venue-list')
         )
         response_data = response.json()
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -120,8 +122,9 @@ class VenueTrackApiTests(APITestCase):
 
     def test_venue_details(self):
         response = self.client.get(
-            f'/api/venue/{self.example_venue.id}/'
+            reverse('venue-detail', kwargs={'id': self.example_venue.id})
         )
+
         response_data = response.json()
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertEqual(response_data.get('name'), self.example_venue.name)
@@ -146,11 +149,14 @@ class VenueTrackApiTests(APITestCase):
             response = self.client.post(
                 f'/api/track/',
                 {
-                    'venue': self.example_venue.id,
+                    'venue': {
+                        'href': f'http://testserver/api/venue/{self.example_venue.id}/'
+                    },
                     'name': 'test track',
                     'description': 'test track description',
                     'capacity': 100,
-                }
+                },
+                format='json'
             )
             self.assertEqual(response.status_code, HTTPStatus.CREATED)
 
@@ -199,16 +205,21 @@ class VenueTrackApiTests(APITestCase):
             response = self.client.put(
                 f'/api/track/{self.example_track.id}/',
                 {
-                    'venue': self.example_venue.id,
+                    'venue': {
+                        'href': f'http://testserver/api/venue/{self.example_venue.id}/'
+                    },
                     'name': 'test track',
                     'description': 'test track description',
                     'capacity': 100,
-                }
+                }, format='json'
             )
             response_data = response.json()
             self.assertEqual(response.status_code, HTTPStatus.OK)
             self.assertEqual(response_data.get('name'), 'test track')
-            self.assertEqual(response_data.get('venue'), self.example_venue.id)
+            self.assertEqual(
+                get_entity_id(response_data.get('venue', {}).get('href')),
+                f'{self.example_venue.id}'
+            )
 
         with self.subTest('venue not found - bad request'):
             response = self.client.put(
