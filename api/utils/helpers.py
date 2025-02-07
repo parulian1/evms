@@ -1,5 +1,6 @@
+import re
 from http import HTTPStatus
-
+from typing import Union
 
 from rest_framework import exceptions, serializers
 from rest_framework.views import Response, exception_handler
@@ -15,9 +16,24 @@ def get_entity_href_serializer(model_class, meta_extra_kwargs=None, *init_args, 
         class Meta:
             model = model_class
             fields = ('href', 'name',)
-            extra_kwargs = meta_extra_kwargs if meta_extra_kwargs is not None else {'href': {'lookup_field': 'slug', }, }
+            extra_kwargs = meta_extra_kwargs if meta_extra_kwargs is not None else {'href': {'lookup_field': 'id', }, }
 
     return EntityHrefSerializer(*init_args, **init_kwargs)
+
+
+def get_entity_id(href: str) -> Union[int, None]:
+    """ Given an href (url string), return the primary key for a product (or none).
+    """
+    regex = re.compile(r'.+?(?P<id>[a-zA-Z0-9-_]+)/$')
+    # make sure href is always a string
+    if isinstance(href, str):
+        match = regex.search(href)
+        if match:
+            return match.groupdict()['id']
+
+def get_entity(model_class, href):
+    instance = model_class.objects.get(id=get_entity_id(href))
+    return instance
 
 
 def api_exception_handler(exception: Exception, context: dict) -> Response:
