@@ -15,8 +15,6 @@ from api.session_management.views import EventViewSet, SessionViewSet, SessionPu
 from api.track.views import VenueViewSet, TrackViewSet
 from api.users.views import CustomObtainTokenPairView, RegistrationView, UserProfileView
 
-app_name = 'api'
-
 router = DefaultRouter()
 router.register(r'venue', VenueViewSet, basename='venue')
 router.register(r'track', TrackViewSet, basename='track')
