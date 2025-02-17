@@ -34,7 +34,7 @@ jobs:
 
     - name: Run unit tests
       run: pytest
-      continue-on-error: ${{ always() }} # Continue running even if tests fail
+      #continue-on-error: ${{ always() }} # Continue running even if tests fail
 
     - name: Build Docker image
       if: ${{ success() }} # Execute if previous step (unit test) is successful
