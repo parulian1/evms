@@ -33,7 +33,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run unit tests
-      run: coverage-3.10 run --source='.' manage.py test api
+      run: pytest
       #continue-on-error: ${{ always() }} # Continue running even if tests fail
 
     - name: Build Docker image
