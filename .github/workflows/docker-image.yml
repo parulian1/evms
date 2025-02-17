@@ -44,7 +44,7 @@ jobs:
         # docker build -t my-image .
         #echo "Docker image built successfully"
         docker build . --file Dockerfile --tag my-image-name:$(date +%s)
-      continue-on-error: ${{ always() }} # Continue even if image build fails
+     # continue-on-error: ${{ always() }} # Continue even if image build fails
         
   
 
