@@ -14,8 +14,8 @@ jobs:
     steps:
     - name: install, and test
       run: |
-        pip install -r requirements.txt
-        python manage.py run test
+        pip install -r ../requirements.txt
+        python ../manage.py run test
         
   build:
     needs: test
