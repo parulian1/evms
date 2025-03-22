@@ -44,7 +44,7 @@ jobs:
     - uses: google-github-actions/setup-gcloud@main 
       with: 
         service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ env.PROJECT_ID }}
+        project_id: ${{ secrets.PROJECT_ID }}
         export_default_credentials: True
 
     - name: Set up Python
