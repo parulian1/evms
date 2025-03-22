@@ -57,6 +57,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Initialize Database
+      run: |
+        # Example: Run your database schema setup and any necessary migrations
+        python manage.py migrate
+
     - name: Run tests with coverage
       env: 
         DATABASE_URL: postgres://testuser:testpassword@localhost/testdb
