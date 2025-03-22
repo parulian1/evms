@@ -41,21 +41,21 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-cov
 
     - name: Run tests with coverage
       run: | 
-        pytest --cov=./ --cov-report=xml
+        coverage-3.10 run --source='.' manage.py test api
+        coverage report -m
+        coverage xml
     - name: Check test coverage meets threshold
       id: coverage
       run: |
-        COVERAGE=$(xmllint --xpath "string(//coverage/@line-rate)" coverage.xml)
+        COVERAGE=$(coverage xml -o - | xmllint --xpath "string(//coverage/@line-rate)" -)
         THRESHOLD=0.80
         if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
           echo "Test coverage ($COVERAGE) is below the threshold ($THRESHOLD)."
           exit 1
         fi
-      continue-on-error: false
     #- name: Run unit tests
       #run: python manage.py test
       #continue-on-error: ${{ always() }} # Continue running even if tests fail
