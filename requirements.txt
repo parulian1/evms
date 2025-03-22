@@ -5,6 +5,7 @@ babel==2.17.0
 certifi==2025.1.31
 charset-normalizer==3.4.1
 coverage==7.6.10
+dj-database-url==2.3.0
 Django==5.0
 django-autoslug==1.9.9
 djangorestframework==3.15.2
@@ -28,6 +29,7 @@ MarkupSafe==3.0.2
 openapi==2.0.0
 packaging==24.2
 pluggy==1.5.0
+psycopg-binary==3.2.5
 psycopg2-binary==2.9.10
 Pygments==2.19.1
 PyJWT==2.10.1

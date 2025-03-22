@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import dj_database_url
+
 from datetime import timedelta
 from pathlib import Path
 
@@ -85,21 +87,28 @@ WSGI_APPLICATION = 'evms.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-
-        'NAME': 'eventmanagement',
-
-        'USER': 'dev',
-
-        'PASSWORD': 'dev',
-
-        'HOST': 'localhost',
-
-        'PORT': '5433',
-    }
+    'default': dj_database_url.config(
+        # default='sqlite:///db.sqlite3'
+        engine='django.db.backends.postgresql_psycopg2',
+        default='postgres://dev:dev@localhost:5432/eventmanagement',
+    )
 }
+# DATABASES = {
+#     'default': {
+#
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#
+#         'NAME': 'eventmanagement',
+#
+#         'USER': 'dev',
+#
+#         'PASSWORD': 'dev',
+#
+#         'HOST': 'localhost',
+#
+#         'PORT': '5433',
+#     }
+# }
 
 
 # Password validation
