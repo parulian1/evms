@@ -31,9 +31,9 @@ jobs:
           POSTGRES_PASSWORD: testpassword
           POSTGRES_DB: testdb
         ports:
-          - 5433:5433
+          - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U testuser -d testdb -p 5433"
+          --health-cmd "pg_isready -U testuser -d testdb"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 3
@@ -64,7 +64,7 @@ jobs:
 
     - name: Run tests with coverage
       env: 
-        DATABASE_URL: postgres://testuser:testpassword@localhost:5433/testdb
+        DATABASE_URL: postgres://testuser:testpassword@localhost:5432/testdb
       run: | 
         coverage-3.10 run --source='.' manage.py test api
         coverage report -m
