@@ -102,9 +102,9 @@ jobs:
         docker build -t asia-southeast2-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest .
      # continue-on-error: ${{ always() }} # Continue even if image build fails
 
-    #- name: Authenticate Docker with GCR
-    #  run: |
-    #    gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io
+    - name: Authenticate Docker with GCR
+      run: |
+        gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io
 
     - name: Push Docker Image to GCR (Container Registry)
       env: 
