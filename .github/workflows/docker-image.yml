@@ -44,7 +44,7 @@ jobs:
       
     - uses: google-github-actions/setup-gcloud@v2
       with: 
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         project_id: ${{ secrets.PROJECT_ID }}
         export_default_credentials: True
 
@@ -96,6 +96,8 @@ jobs:
     - name: Build and push Docker image
       if: success()
       #if: ${{ success() }} # Execute if previous step (unit test) is successful
+      env: 
+        PROJECT_ID: ${{ secrets.PROJECT_ID }}
       run: |
         gcloud auth configure-docker asia-southeast2-docker.pkg.dev
         docker build -t asia-southeast2-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}/${{ env.IMAGE_NAME }}:latest .
