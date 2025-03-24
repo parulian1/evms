@@ -41,7 +41,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - uses: google-github-actions/setup-gcloud@main 
+      
+    - uses: google-github-actions/setup-gcloud@v0 
       with: 
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ secrets.PROJECT_ID }}
@@ -84,10 +85,12 @@ jobs:
           echo "Test coverage ($COVERAGE) is below the threshold ($THRESHOLD)."
           exit 1
         fi
-    #- name: Run unit tests
-      #run: python manage.py test
-      #continue-on-error: ${{ always() }} # Continue running even if tests fail
-
+    
+    - name: Configure Docker Client
+      if: success()
+      run: |-
+        gcloud auth configure-docker --quiet
+        
     - name: Build Docker image
       if: success()
       #if: ${{ success() }} # Execute if previous step (unit test) is successful
@@ -96,22 +99,17 @@ jobs:
         # For example, build a Docker image
         # docker build -t my-image .
         #echo "Docker image built successfully"
-        docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+        docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest .
      # continue-on-error: ${{ always() }} # Continue even if image build fails
 
-    - name: Configure Docker Client
-      if: success()
-      run: |-
-        gcloud auth configure-docker --quiet
+   
 
-    #- name: Push Docker Image to GCR (Container Registry)
-    #  env: 
-    #    GIT_TAG: v0.1.0
-    #  run: |-
-    #    docker tag $IMAGE_NAME:latest.gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-    #    docker tag $IMAGE_NAME:latest.gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
-    #    docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
-    #    docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:$GIT_TAG
+    - name: Push Docker Image to GCR (Container Registry)
+      env: 
+        GIT_TAG: v0.1.0
+      run: |-
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:tag
+        docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:${{ env.GIT_TAG }}
   
 
   
